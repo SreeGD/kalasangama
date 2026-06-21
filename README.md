@@ -4,6 +4,9 @@ Website & tooling for **Kala Sangama** — the Sri Krishna Janmashtami 2026 inte
 coloring & painting competition by **ISKCON South Bengaluru | ICC Mega School Outreach**.
 Theme: *“Sri Krishna at Vrindavan Village.”*
 
+> **Running the event?** Start with the **[Operations Runbook](RUNBOOK.md)** — the
+> end-to-end playbook (setup → registration → Level 1 → judging → finals).
+
 Built in three phases, each deployable independently:
 
 | Phase | What | Tech | Folder |
