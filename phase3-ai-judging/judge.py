@@ -261,16 +261,23 @@ def parse_filename(name: str) -> dict | None:
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
         return None  # 4th field must be an ISO date
     dehyphen = lambda s: s.replace("-", " ").strip()
-    time = parts[4].strip() if len(parts) >= 5 else ""
-    if time and not re.match(r"^\d{3,4}$", time):
-        time = ""  # ignore a non HHMM token in the time slot
+    # Remaining tokens after the date are time and/or RegID, in any order:
+    # a 3-4 digit token is the time; anything else is the RegID.
+    time, reg_id = "", ""
+    for tok in (p.strip() for p in parts[4:]):
+        if not tok:
+            continue
+        if not time and re.match(r"^\d{3,4}$", tok):
+            time = tok
+        elif not reg_id:
+            reg_id = tok
     return {
         "school": dehyphen(parts[0]),
         "category": category,
         "student": dehyphen(parts[2]),
         "date": date,
         "time": time,
-        "reg_id": parts[5].strip() if len(parts) >= 6 else "",
+        "reg_id": reg_id,
     }
 
 

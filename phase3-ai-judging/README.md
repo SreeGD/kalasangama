@@ -44,6 +44,22 @@ e.g.  Sri-Vidya-School__Coloring__Diya-Sharma__2026-07-20__1015.jpg
 Columns `id, school, student, standard, category, title, image` (`image` = filename in
 `IMAGES_DIR`). A sample `input/submissions.csv` is included.
 
+### Helper: generate filenames from the roster ([`tools/build_filenames.py`](./tools/build_filenames.py))
+So coordinators don't hand-type names. Export the Student Registration sheet to CSV, then:
+
+```bash
+# 1) make a checklist of the correct name for every student
+python tools/build_filenames.py --csv students.csv --date 2026-07-20
+#    -> filenames.csv  (reg_id, school, student, category, suggested_name)
+
+# 2) OR auto-rename a folder of loosely-named photos into the convention
+python tools/build_filenames.py --csv students.csv --date 2026-07-20 --rename ./photos
+python tools/build_filenames.py --csv students.csv --date 2026-07-20 --rename ./photos --apply
+#    matches each file by RegID in its name; add --copy ./renamed to keep originals
+```
+Category comes from a `category` column or is inferred from the standard (2–5 = Coloring,
+6–10 = Painting). Stdlib only — no extra installs. Preview first; `--apply` to commit.
+
 ## Drive mode (read straight from the Google Form)
 
 Use this to pull images posted to the **Artwork Submission** form (Phase 2 setup).

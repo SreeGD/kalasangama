@@ -27,3 +27,8 @@ Mount-Carmel__Painting__Aisha-Khan__2026-07-21__1145__KS2026-0107.jpg
 - If two photos are sent for the same student & category, the **newest** one is used.
 - A file that doesn't follow this pattern is skipped and listed in the report so you
   can rename and re-add it.
+
+### Don't want to type names by hand?
+Ask the admin for the pre-made name list — `tools/build_filenames.py` turns the
+registration sheet into a ready filename for every student, or can auto-rename a folder
+of photos for you (match by registration-card id).
