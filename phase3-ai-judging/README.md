@@ -5,31 +5,44 @@ vision and produces a ranked report for human judges. The AI score is an **advis
 pre-screen** — humans decide the final winners.
 
 ```
-input ──▶ judge.py ──▶ output/results.csv
-(CSV+images               output/results.html  ◀── review here
- or Google Sheet+Drive)
+folder of named images ──▶ judge.py ──▶ output/results.html  ◀── review here
+(or CSV+images, or Google Sheet+Drive)   output/results.csv
+                                         output/shortlist.csv (top-3 per school&category)
 ```
 
-## Quick start (local mode — no Google setup)
+## Quick start (local-folder — no Google setup, no CSV)
+
+Name each photo with the metadata, drop them in a folder, run the script.
 
 ```bash
 cd phase3-ai-judging
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-cp .env.example .env          # then add your ANTHROPIC_API_KEY
-# put artwork photos in input/images/ and list them in input/submissions.csv
+cp .env.example .env          # then add your ANTHROPIC_API_KEY (INPUT_MODE=local-folder)
+# put artwork photos in input/images/ named like the convention below
 
-python judge.py --dry-run     # sanity-check what will be judged
+python judge.py --dry-run     # sanity-check what will be judged (no API calls)
 python judge.py               # judge everything → output/results.html
 ```
 
-Open `output/results.html` in a browser to review scores, per-criterion breakdowns,
-and the AI-recommended top 3 per school & category.
+Open `output/results.html` to review scores, per-criterion breakdowns, the AI-recommended
+**top 3 per school & category**, and the **inter-school leaderboard** per category.
 
-### `submissions.csv` columns
-`id, school, student, standard, category, title, image` — `image` is a filename in
-`IMAGES_DIR`. A sample is included.
+### Filename convention (local-folder)
+```
+School__Category__Student__YYYY-MM-DD__HHMM[__RegID].jpg
+e.g.  Sri-Vidya-School__Coloring__Diya-Sharma__2026-07-20__1015.jpg
+```
+- Fields split on `__`; a `-` inside a field shows as a space (spaces also allowed).
+- **Category** = `Coloring` or `Painting` (`C` / `P` accepted).
+- **Time** and **RegID** are optional (time falls back to the file's modified time).
+- Duplicates for the same student & category → newest kept. Bad filenames are skipped
+  and listed in the report. Full guide for coordinators: **[NAMING.md](./NAMING.md)**.
+
+### Alternative: CSV mode (`INPUT_MODE=local`)
+Columns `id, school, student, standard, category, title, image` (`image` = filename in
+`IMAGES_DIR`). A sample `input/submissions.csv` is included.
 
 ## Drive mode (read straight from the Google Form)
 
@@ -48,6 +61,12 @@ Use this to pull images posted to the **Artwork Submission** form (Phase 2 setup
    ```
 5. `pip install gspread google-api-python-client google-auth` (already in requirements).
 6. `python judge.py`
+
+## Drive folder mode — coming soon
+
+`INPUT_MODE=drive-folder` will read images straight from a Google Drive folder using the
+same filename convention (no Sheet needed). Until it lands, **download or sync that Drive
+folder locally** and use `local-folder` mode pointed at it (`IMAGES_DIR`).
 
 ## Common commands
 

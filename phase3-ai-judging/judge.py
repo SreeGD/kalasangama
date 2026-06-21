@@ -5,10 +5,19 @@ Kala Sangama 2026 — AI judging pipeline (admin-run, advisory pre-screen)
 Reads shortlisted artwork submissions, scores each painting against the rubric
 using Claude vision, and writes a ranked report (CSV + HTML) for human judges.
 
-Two input modes (set INPUT_MODE in .env):
-  local  — point at a CSV + a folder of images. Zero Google setup. (default)
-  drive  — read the Google Form responses Sheet and download images from Drive
-           via a Google service account.
+Input modes (set INPUT_MODE in .env):
+  local-folder — a folder of images named with all the metadata. No CSV, no
+                 Google setup. (recommended; the default)
+  local        — a CSV + a folder of images.
+  drive        — read the Google Form responses Sheet and download images from Drive.
+  drive-folder — read images straight from a Google Drive folder (coming soon).
+
+Filename convention for local-folder / drive-folder:
+  School__Category__Student__YYYY-MM-DD__HHMM[__RegID].ext
+  e.g.  Sri-Vidya-School__Coloring__Diya-Sharma__2026-07-20__1015.jpg
+  - fields split on "__"; "-" inside a field becomes a space on display
+  - Category is Coloring or Painting (C / P also accepted)
+  - Time and RegID are optional (time falls back to the file's modified time)
 
 Usage:
   python judge.py                         # judge everything
@@ -17,7 +26,8 @@ Usage:
   python judge.py --limit 5               # quick test on first 5
   python judge.py --dry-run               # list submissions, no API calls
 
-The AI score is ADVISORY. Final winners are chosen by human judges.
+Outputs (in OUTPUT_DIR): results.html, results.csv, shortlist.csv (top-3 per
+school & category). The AI score is ADVISORY — human judges decide final winners.
 """
 from __future__ import annotations
 
@@ -26,8 +36,10 @@ import base64
 import csv
 import json
 import os
+import re
 import sys
 import time
+from datetime import datetime
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -48,6 +60,13 @@ CACHE_PATH = OUTPUT_DIR / "_cache.json"
 MEDIA_TYPES = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
                ".webp": "image/webp", ".gif": "image/gif"}
 
+# Canonical category labels (must match the keys in rubric.yaml -> category_notes)
+CAT_COLORING = "Coloring (Std 2–5)"
+CAT_PAINTING = "Painting (Std 6–10)"
+
+# Filenames that didn't match the convention (surfaced in the report)
+UNMATCHED: list[str] = []
+
 
 # ===========================================================================
 # Data model
@@ -60,6 +79,9 @@ class Submission:
     category: str
     standard: str = ""
     title: str = ""
+    date: str = ""         # YYYY-MM-DD
+    time: str = ""         # HHMM
+    reg_id: str = ""       # optional Phase-2 card id, e.g. KS2026-0042
     image_path: Path | None = None   # local mode
     image_bytes: bytes | None = None # drive mode (downloaded in memory)
     image_media_type: str = "image/jpeg"
@@ -215,6 +237,85 @@ def load_local() -> list[Submission]:
     return subs
 
 
+def canon_category(raw: str) -> str:
+    """Map a free-form category token to the canonical rubric label, or '' if unknown."""
+    t = (raw or "").strip().lower()
+    if t in ("c", "color", "colour", "coloring", "colouring") or t.startswith("color") or t.startswith("colour"):
+        return CAT_COLORING
+    if t in ("p", "paint", "painting") or t.startswith("paint"):
+        return CAT_PAINTING
+    return ""
+
+
+def parse_filename(name: str) -> dict | None:
+    """Parse 'School__Category__Student__YYYY-MM-DD__HHMM[__RegID].ext'.
+    Returns a metadata dict, or None if it doesn't match the convention."""
+    stem = name.rsplit(".", 1)[0]
+    parts = [p.strip() for p in stem.split("__") if p.strip() != ""]
+    if len(parts) < 4:
+        return None
+    category = canon_category(parts[1])
+    if not category:
+        return None
+    date = parts[3].strip()
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+        return None  # 4th field must be an ISO date
+    dehyphen = lambda s: s.replace("-", " ").strip()
+    time = parts[4].strip() if len(parts) >= 5 else ""
+    if time and not re.match(r"^\d{3,4}$", time):
+        time = ""  # ignore a non HHMM token in the time slot
+    return {
+        "school": dehyphen(parts[0]),
+        "category": category,
+        "student": dehyphen(parts[2]),
+        "date": date,
+        "time": time,
+        "reg_id": parts[5].strip() if len(parts) >= 6 else "",
+    }
+
+
+def load_local_folder() -> list[Submission]:
+    """Scan a folder of images whose FILENAMES carry the metadata (no CSV)."""
+    folder = Path(os.getenv("IMAGES_DIR", HERE / "input" / "images"))
+    if not folder.is_dir():
+        sys.exit(f"IMAGES_DIR not found: {folder}\nSee README for the filename convention.")
+    by_key: dict[tuple, Submission] = {}
+    subs: list[Submission] = []
+    for p in sorted(folder.iterdir()):
+        if p.suffix.lower() not in MEDIA_TYPES or p.name.startswith("."):
+            continue
+        meta = parse_filename(p.name)
+        if not meta:
+            UNMATCHED.append(p.name)
+            print(f"⚠  filename does not match convention, skipping: {p.name}")
+            continue
+        if not meta["time"]:
+            meta["time"] = datetime.fromtimestamp(p.stat().st_mtime).strftime("%H%M")
+        sub = Submission(
+            sub_id=meta["reg_id"] or p.name,
+            school=meta["school"], student=meta["student"], category=meta["category"],
+            date=meta["date"], time=meta["time"], reg_id=meta["reg_id"], image_path=p)
+        # dedupe same student+category, keeping the latest by date+time
+        key = (meta["reg_id"] or f'{sub.school}|{sub.student}|{sub.category}'.lower())
+        prev = by_key.get(key)
+        if prev and (prev.date, prev.time) >= (sub.date, sub.time):
+            print(f"⚠  duplicate, keeping newer: {p.name}")
+            continue
+        if prev:
+            print(f"⚠  duplicate, replacing older entry for {sub.student} ({sub.category})")
+            subs.remove(prev)
+        by_key[key] = sub
+        subs.append(sub)
+    return subs
+
+
+def load_drive_folder() -> list[Submission]:
+    """Read images straight from a Google Drive folder, using the same filename
+    convention. (Coming soon — implemented in the next phase.)"""
+    sys.exit("INPUT_MODE=drive-folder is coming soon. Use 'local-folder' for now "
+             "(download/sync the Drive folder locally and point IMAGES_DIR at it).")
+
+
 def load_drive() -> list[Submission]:
     """Read the Google Form responses Sheet and download artwork from Drive
     using a service account. Needs google-api-python-client + gspread."""
@@ -283,78 +384,127 @@ def _drive_file_id(link: str) -> str:
 def write_reports(rubric: dict, results: list[Result]):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     crit_keys = [c["key"] for c in rubric["criteria"]]
-
-    # Rank within (category, school): mark recommended top-3 per school/category.
     ok = [r for r in results if not r.error]
-    ok.sort(key=lambda r: (r.submission.category, r.submission.school, -r.weighted_total))
+
+    # rank within (category, school) -> the top-3 advancement list
     rank_in_school: dict[int, int] = {}
     seen: dict[tuple, int] = {}
-    for r in ok:
+    for r in sorted(ok, key=lambda r: (r.submission.category, r.submission.school, -r.weighted_total)):
         key = (r.submission.category, r.submission.school)
         seen[key] = seen.get(key, 0) + 1
         rank_in_school[id(r)] = seen[key]
 
-    # CSV
+    # rank within category across all schools -> inter-school leaderboard
+    overall_rank: dict[int, int] = {}
+    seenc: dict[str, int] = {}
+    for r in sorted(ok, key=lambda r: (r.submission.category, -r.weighted_total)):
+        c = r.submission.category
+        seenc[c] = seenc.get(c, 0) + 1
+        overall_rank[id(r)] = seenc[c]
+
+    # full results.csv
     csv_path = OUTPUT_DIR / "results.csv"
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["category", "school", "student", "standard", "weighted_total",
-                    "rank_in_school", *crit_keys, "notes", "error"])
+        w.writerow(["category", "school", "student", "date", "time", "reg_id",
+                    "weighted_total", "rank_in_school", "top3", "overall_rank",
+                    *crit_keys, "notes", "error"])
         for r in sorted(results, key=lambda r: (r.submission.category,
                         r.submission.school, -r.weighted_total)):
-            w.writerow([r.submission.category, r.submission.school, r.submission.student,
-                        r.submission.standard, r.weighted_total,
-                        rank_in_school.get(id(r), ""),
-                        *[r.scores.get(k, "") for k in crit_keys],
-                        r.notes, r.error])
+            s = r.submission
+            rk = rank_in_school.get(id(r), "")
+            w.writerow([s.category, s.school, s.student, s.date, s.time, s.reg_id,
+                        r.weighted_total, rk,
+                        "yes" if isinstance(rk, int) and rk <= 3 else "",
+                        overall_rank.get(id(r), ""),
+                        *[r.scores.get(k, "") for k in crit_keys], r.notes, r.error])
 
-    _write_html(rubric, results, rank_in_school, crit_keys)
+    # shortlist.csv — only the recommended top-3 per school & category
+    with open(OUTPUT_DIR / "shortlist.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["category", "school", "rank_in_school", "student", "reg_id", "weighted_total"])
+        for r in sorted(ok, key=lambda r: (r.submission.category, r.submission.school,
+                        rank_in_school[id(r)])):
+            if rank_in_school[id(r)] <= 3:
+                s = r.submission
+                w.writerow([s.category, s.school, rank_in_school[id(r)], s.student,
+                            s.reg_id, r.weighted_total])
+
+    _write_html(rubric, results, rank_in_school, overall_rank, crit_keys)
     return csv_path
 
 
-def _write_html(rubric, results, rank_in_school, crit_keys):
+def _write_html(rubric, results, rank_in_school, overall_rank, crit_keys):
     import html
+    ok = [x for x in results if not x.error]
+
+    # per-category inter-school leaderboards (top 5)
+    cats: dict[str, list] = {}
+    for r in ok:
+        cats.setdefault(r.submission.category, []).append(r)
+    boards = []
+    for cat in sorted(cats):
+        top = sorted(cats[cat], key=lambda r: overall_rank[id(r)])[:5]
+        items = "".join(
+            f'<li><b>{overall_rank[id(r)]}.</b> {html.escape(r.submission.student)} '
+            f'<small>· {html.escape(r.submission.school)}</small> '
+            f'<span class="score">{r.weighted_total}</span></li>' for r in top)
+        boards.append(f'<div class="board"><h3>{html.escape(cat)}</h3><ol class="lb">{items}</ol></div>')
+
     rows = []
-    for r in sorted([x for x in results if not x.error],
-                    key=lambda r: (r.submission.category, r.submission.school, -r.weighted_total)):
+    for r in sorted(ok, key=lambda r: (r.submission.category, r.submission.school, -r.weighted_total)):
         s = r.submission
         rk = rank_in_school.get(id(r), "")
         top = "top3" if isinstance(rk, int) and rk <= 3 else ""
         img = ""
         if s.image_path:
             img = f'<img src="{html.escape(os.path.relpath(s.image_path, OUTPUT_DIR))}" loading="lazy">'
+        when = html.escape((s.date + (" " + s.time if s.time else "")).strip())
         crit_cells = "".join(f"<td>{r.scores.get(k,'')}</td>" for k in crit_keys)
         rows.append(
             f'<tr class="{top}"><td>{img}</td><td>{html.escape(s.category)}</td>'
-            f'<td>{html.escape(s.school)}</td><td>{html.escape(s.student)} '
-            f'<small>{html.escape(s.standard)}</small></td>'
-            f'<td class="score">{r.weighted_total}</td><td>{rk}</td>{crit_cells}'
-            f'<td class="notes">{html.escape(r.notes)}</td></tr>')
+            f'<td>{html.escape(s.school)}</td>'
+            f'<td>{html.escape(s.student)}<br><small>{when}'
+            f'{(" · " + html.escape(s.reg_id)) if s.reg_id else ""}</small></td>'
+            f'<td class="score">{r.weighted_total}</td><td>{rk}</td><td>{overall_rank.get(id(r),"")}</td>'
+            f'{crit_cells}<td class="notes">{html.escape(r.notes)}</td></tr>')
+
     errs = "".join(f"<li>{html.escape(r.submission.student)} "
                    f"({html.escape(r.submission.school)}): {html.escape(r.error)}</li>"
                    for r in results if r.error)
+    unmatched = "".join(f"<li>{html.escape(n)}</li>" for n in UNMATCHED)
     head = "".join(f"<th>{html.escape(c['name'])}</th>" for c in rubric["criteria"])
     doc = f"""<!doctype html><meta charset=utf-8>
 <title>Kala Sangama 2026 — AI Judging Report</title>
 <style>
  body{{font-family:system-ui,sans-serif;margin:24px;color:#3a2414;background:#fbf8e9}}
- h1{{color:#4a1d0a}} .sub{{color:#7a5c44}}
+ h1{{color:#4a1d0a;margin-bottom:2px}} h3{{color:#4a1d0a;margin:0 0 8px}} .sub{{color:#7a5c44}}
  table{{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 4px 14px rgba(74,29,10,.08)}}
  th,td{{border-bottom:1px solid #eee;padding:8px 10px;text-align:left;vertical-align:top;font-size:14px}}
  th{{background:#4a1d0a;color:#f8d9b8;position:sticky;top:0}}
  img{{width:84px;height:84px;object-fit:cover;border-radius:8px}}
  .score{{font-weight:700;font-size:16px;color:#c4630b}}
  tr.top3{{background:#fff6e8}} tr.top3 .score{{color:#a8500a}}
- .notes{{max-width:320px;color:#555}} .legend{{margin:10px 0;color:#7a5c44}}
+ .notes{{max-width:300px;color:#555}} .legend{{margin:10px 0;color:#7a5c44}}
+ .boards{{display:flex;flex-wrap:wrap;gap:18px;margin:16px 0 26px}}
+ .board{{background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 4px 14px rgba(74,29,10,.08);min-width:280px}}
+ .lb{{margin:0;padding-left:4px;list-style:none}} .lb li{{padding:4px 0;border-bottom:1px solid #f3ead2}}
+ .lb small{{color:#7a5c44}}
  .err{{background:#fff0f0;border:1px solid #f3c0c0;padding:10px;border-radius:8px;margin-top:18px}}
+ .warn{{background:#fff8e8;border:1px solid #f0d9a8;padding:10px;border-radius:8px;margin-top:18px}}
 </style>
 <h1>Kala Sangama 2026 — AI Judging Report</h1>
 <p class=sub>Theme: <b>{html.escape(rubric['theme'])}</b> · Advisory pre-screen — human judges decide final winners.</p>
-<p class=legend>Highlighted rows = AI-recommended top 3 within that school &amp; category.</p>
+
+<h3>Inter-school leaderboard (overall, per category)</h3>
+<div class=boards>{''.join(boards)}</div>
+
+<p class=legend>Highlighted rows = AI-recommended top 3 within that school &amp; category (the Level-1 advancement list — see <b>shortlist.csv</b>).</p>
 <table><thead><tr><th>Art</th><th>Category</th><th>School</th><th>Student</th>
-<th>Score /100</th><th>Rank</th>{head}<th>Notes</th></tr></thead>
+<th>Score /100</th><th>In-school</th><th>Overall</th>{head}<th>Notes</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table>
 {f'<div class=err><b>Could not judge ({errs.count("<li>")}):</b><ul>{errs}</ul></div>' if errs else ''}
+{f'<div class=warn><b>Skipped — filename did not match the convention ({len(UNMATCHED)}):</b><ul>{unmatched}</ul></div>' if unmatched else ''}
 """
     (OUTPUT_DIR / "results.html").write_text(doc, encoding="utf-8")
 
@@ -386,9 +536,17 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="list submissions, no API calls")
     args = ap.parse_args()
 
-    mode = os.getenv("INPUT_MODE", "local").lower()
+    mode = os.getenv("INPUT_MODE", "local-folder").lower()
     print(f"Input mode: {mode} · model: {args.model}")
-    subs = load_drive() if mode == "drive" else load_local()
+    loaders = {
+        "local-folder": load_local_folder,
+        "local": load_local,
+        "drive": load_drive,
+        "drive-folder": load_drive_folder,
+    }
+    if mode not in loaders:
+        sys.exit(f"Unknown INPUT_MODE '{mode}'. Choose: {', '.join(loaders)}")
+    subs = loaders[mode]()
 
     if args.category:
         subs = [s for s in subs if args.category.lower() in s.category.lower()]
@@ -400,7 +558,11 @@ def main():
 
     if args.dry_run:
         for s in subs:
-            print(f"  - [{s.category}] {s.school} / {s.student} ({s.standard})")
+            when = f"{s.date} {s.time}".strip()
+            tag = f" · {s.reg_id}" if s.reg_id else ""
+            print(f"  - [{s.category}] {s.school} / {s.student}  ({when}){tag}")
+        if UNMATCHED:
+            print(f"\n{len(UNMATCHED)} file(s) skipped (bad filename): " + ", ".join(UNMATCHED))
         return
 
     if not subs:
@@ -437,9 +599,11 @@ def main():
         save_cache(cache)
     csv_path = write_reports(rubric, results)
     judged = sum(1 for r in results if not r.error)
-    print(f"\n✅ Judged {judged}/{len(results)}.")
-    print(f"   CSV : {csv_path}")
-    print(f"   HTML: {OUTPUT_DIR / 'results.html'}")
+    print(f"\n✅ Judged {judged}/{len(results)}." +
+          (f"  ({len(UNMATCHED)} file(s) skipped — bad filename)" if UNMATCHED else ""))
+    print(f"   HTML     : {OUTPUT_DIR / 'results.html'}")
+    print(f"   CSV      : {csv_path}")
+    print(f"   Shortlist: {OUTPUT_DIR / 'shortlist.csv'}")
 
 
 if __name__ == "__main__":

@@ -40,9 +40,11 @@ run creates the School, Student, and Artwork-Submission forms wired to one Sheet
 
 ## Phase 3 — run the AI judging
 See [`phase3-ai-judging/README.md`](phase3-ai-judging/README.md). Reads submissions
-(local CSV+images, or the Google Sheet+Drive), scores each piece against
-[`rubric.yaml`](phase3-ai-judging/rubric.yaml), and writes a ranked `results.html`.
-**Advisory only** — human judges decide final winners.
+(a folder of named images — see [NAMING.md](phase3-ai-judging/NAMING.md) — or a CSV, or
+the Google Sheet+Drive), scores each piece against
+[`rubric.yaml`](phase3-ai-judging/rubric.yaml), and writes a ranked `results.html`,
+`results.csv`, and `shortlist.csv` (top-3 per school & category). **Advisory only** —
+human judges decide final winners.
 
 ---
 
