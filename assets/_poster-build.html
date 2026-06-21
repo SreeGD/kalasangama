@@ -1,0 +1,274 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Marcellus&family=Noto+Sans+Kannada:wght@500;600&family=Noto+Serif+Kannada:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --saffron:#e07b1a; --marigold:#f4a93f; --deep:#bd5d08; --maroon:#4a1d0a;
+    --maroon2:#5e2a12; --cream:#fcf5e3; --cream2:#f7ebcf; --gold:#c98f2e; --gold-l:#e9c46a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#888}
+
+  /* ---------- shared canvases ---------- */
+  .canvas{position:relative;overflow:hidden;background:var(--cream);color:var(--maroon)}
+  #poster{width:1200px;height:1600px}
+  #og{width:1200px;height:630px;margin-top:40px}
+
+  /* warm sunrise wash + central glow */
+  .wash{position:absolute;inset:0;
+    background:
+      radial-gradient(120% 70% at 50% 34%, rgba(244,169,63,.55), rgba(252,245,227,0) 60%),
+      radial-gradient(140% 90% at 50% 120%, rgba(189,93,8,.30), rgba(252,245,227,0) 55%),
+      linear-gradient(180deg,#fdf8ec 0%, #fbf2dd 55%, #f6e7c8 100%);}
+  .grain{position:absolute;inset:0;opacity:.05;mix-blend-mode:multiply;
+    background-image:radial-gradient(rgba(74,29,10,.6) .5px, transparent .6px);
+    background-size:4px 4px}
+
+  /* thin double frame */
+  .frame{position:absolute;inset:34px;border:2px solid rgba(74,29,10,.55);border-radius:3px}
+  .frame:after{content:"";position:absolute;inset:7px;border:1px solid rgba(74,29,10,.3)}
+
+  /* sun-ray halo */
+  .halo{position:absolute;border-radius:50%;
+    -webkit-mask:radial-gradient(closest-side, #000 38%, rgba(0,0,0,.55) 60%, transparent 80%);
+            mask:radial-gradient(closest-side, #000 38%, rgba(0,0,0,.55) 60%, transparent 80%);
+    background:repeating-conic-gradient(from 0deg,
+      rgba(201,143,46,.95) 0deg 1.1deg, transparent 1.1deg 6deg);}
+  .halo.soft{background:repeating-conic-gradient(from 3deg,
+      rgba(224,123,26,.5) 0deg 2deg, transparent 2deg 9deg)}
+
+  .axis{position:absolute;left:50%;transform:translateX(-50%);text-align:center;width:100%}
+
+  /* typography */
+  .eyebrow{font-family:'Cinzel',serif;font-weight:600;letter-spacing:.34em;
+    font-size:18px;color:var(--maroon2);text-transform:uppercase}
+  .title{font-family:'Cinzel',serif;font-weight:600;color:var(--maroon);
+    letter-spacing:.04em;line-height:.96}
+  .kn{font-family:'Noto Sans Kannada',serif;font-weight:600;color:var(--deep)}
+  .sub{font-family:'Cormorant Garamond',serif;font-weight:500;color:var(--maroon2)}
+  .ital{font-style:italic}
+  .small{font-family:'Cormorant Garamond',serif}
+
+  /* theme ribbon */
+  .ribbon{display:inline-flex;align-items:center;gap:16px;
+    border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);
+    padding:12px 4px;color:var(--maroon)}
+  .ribbon .lbl{font-family:'Cinzel',serif;font-weight:600;letter-spacing:.28em;
+    font-size:15px;color:var(--deep)}
+  .ribbon .val{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:34px}
+
+  /* category badges */
+  .cats{display:flex;justify-content:center;gap:30px}
+  .cat{width:268px;padding:24px 18px 22px;background:rgba(252,245,227,.7);
+    border:1.5px solid rgba(201,143,46,.7);border-radius:14px;position:relative}
+  .cat:before{content:"";position:absolute;top:-1.5px;left:24px;right:24px;height:3px;
+    background:var(--saffron);border-radius:3px}
+  .cat .h{font-family:'Cinzel',serif;font-weight:600;font-size:26px;color:var(--maroon);letter-spacing:.04em}
+  .cat .s{font-family:'Cormorant Garamond',serif;font-size:23px;color:var(--maroon2);margin-top:4px}
+
+  /* details */
+  .detail .d{font-family:'Cormorant Garamond',serif;font-size:27px;color:var(--maroon2)}
+  .detail .big{font-family:'Marcellus',serif;font-size:33px;color:var(--maroon);letter-spacing:.02em}
+  .dot{display:inline-block;width:6px;height:6px;background:var(--gold);border-radius:50%;
+    transform:translateY(-7px);margin:0 14px}
+
+  .org{font-family:'Cinzel',serif;font-weight:600;letter-spacing:.16em;font-size:16px;color:var(--maroon)}
+  .hk{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--deep)}
+
+  /* Kannada faces */
+  .knd{font-family:'Noto Serif Kannada','Noto Sans Kannada',serif}
+  .kns{font-family:'Noto Sans Kannada',sans-serif}
+</style></head>
+<body>
+
+<!-- ============================== POSTER 1200x1600 ============================== -->
+<div id="poster" class="canvas">
+  <div class="wash"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:300px;background:linear-gradient(180deg,rgba(189,93,8,0) 0%,rgba(189,93,8,.10) 100%)"></div>
+  <svg id="silhouette" width="1200" height="320" style="position:absolute;left:0;bottom:0;opacity:.2" viewBox="0 0 1200 320" preserveAspectRatio="none"></svg>
+  <div class="frame"></div>
+  <div class="grain"></div>
+
+  <!-- toran across the top -->
+  <svg id="toran" width="1132" height="92" viewBox="0 0 1132 92" style="position:absolute;left:50%;transform:translateX(-50%);top:41px"></svg>
+
+  <!-- eyebrow -->
+  <div class="axis" style="top:150px"><div class="eyebrow">ISKCON South Bengaluru &nbsp;·&nbsp; ICC Mega School Outreach</div></div>
+
+  <!-- central emblem: halo + peacock feather -->
+  <div class="halo soft" style="width:560px;height:560px;left:50%;top:198px;transform:translateX(-50%)"></div>
+  <div class="halo"      style="width:430px;height:430px;left:50%;top:263px;transform:translateX(-50%)"></div>
+  <svg id="feather" width="300" height="420" viewBox="0 0 300 420" style="position:absolute;left:50%;top:250px;transform:translateX(-50%)"></svg>
+
+  <!-- title -->
+  <div class="axis" style="top:690px"><div class="kn" style="font-size:40px">ಕಲಾ ಸಂಗಮ</div></div>
+  <div class="axis" style="top:724px"><div class="title" style="font-size:138px">KALA<br>SANGAMA</div></div>
+
+  <!-- subtitle -->
+  <div class="axis" style="top:1006px"><div class="sub" style="font-size:38px;letter-spacing:.04em">Sri Krishna Janmashtami <span style="color:var(--deep)">2026</span></div></div>
+  <div class="axis" style="top:1052px"><div class="sub" style="font-size:25px;letter-spacing:.42em;text-transform:uppercase">Cultural Competitions</div></div>
+
+  <!-- theme ribbon -->
+  <div class="axis" style="top:1110px"><span class="ribbon"><span class="lbl">THEME</span><span class="val">Sri Krishna at Vrindavan Village</span></span></div>
+
+  <!-- categories -->
+  <div class="axis" style="top:1214px"><div class="cats">
+    <div class="cat"><div class="h">COLORING</div><div class="s">Standard 2 – 5</div></div>
+    <div class="cat"><div class="h">PAINTING</div><div class="s">Standard 6 – 10</div></div>
+  </div></div>
+
+  <!-- details -->
+  <div class="axis" style="top:1382px"><div class="detail">
+    <span class="d">Grand Final</span><span class="dot"></span><span class="big">ICC Temple</span><span class="dot"></span><span class="d">10:00 AM</span>
+  </div></div>
+  <div class="axis" style="top:1430px"><div class="detail"><span class="big" style="letter-spacing:.06em">Saturday &nbsp; 22 / 29 August 2026</span></div></div>
+
+  <!-- footer -->
+  <div class="axis" style="top:1496px"><div class="org">॥ &nbsp; Hare Krishna &nbsp; ॥</div></div>
+  <div class="axis" style="top:1526px"><div class="hk">Offered in service · 60–50 Celebration Team</div></div>
+</div>
+
+<!-- ============================== OG 1200x630 ============================== -->
+<div id="og" class="canvas">
+  <div class="wash"></div>
+  <div class="frame" style="inset:24px"></div>
+  <div class="grain"></div>
+
+  <div class="halo soft" style="width:430px;height:430px;left:218px;top:100px"></div>
+  <div class="halo"      style="width:330px;height:330px;left:268px;top:150px"></div>
+  <svg id="feather2" width="220" height="310" viewBox="0 0 300 420" style="position:absolute;left:323px;top:150px"></svg>
+
+  <div style="position:absolute;left:560px;top:150px;width:600px">
+    <div class="eyebrow" style="font-size:14px">ISKCON South Bengaluru · ICC Mega School Outreach</div>
+    <div class="kn" style="font-size:26px;margin-top:14px">ಕಲಾ ಸಂಗಮ</div>
+    <div class="title" style="font-size:78px;margin-top:2px">KALA SANGAMA</div>
+    <div class="sub" style="font-size:27px;margin-top:14px">Sri Krishna Janmashtami <span style="color:var(--deep)">2026</span> · Cultural Competitions</div>
+    <div class="sub ital" style="font-size:26px;color:var(--deep);margin-top:8px">“Sri Krishna at Vrindavan Village”</div>
+    <div class="small" style="font-size:23px;margin-top:14px;color:var(--maroon2)">Coloring · Std 2–5 &nbsp;|&nbsp; Painting · Std 6–10</div>
+  </div>
+</div>
+
+<!-- ============================== KANNADA POSTER 1200x1600 ============================== -->
+<div id="posterKn" class="canvas" style="width:1200px;height:1600px;margin-top:40px">
+  <div class="wash"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:300px;background:linear-gradient(180deg,rgba(189,93,8,0) 0%,rgba(189,93,8,.10) 100%)"></div>
+  <svg id="silhouetteK" width="1200" height="320" style="position:absolute;left:0;bottom:0;opacity:.2" viewBox="0 0 1200 320" preserveAspectRatio="none"></svg>
+  <div class="frame"></div>
+  <div class="grain"></div>
+  <svg id="toranK" width="1132" height="92" viewBox="0 0 1132 92" style="position:absolute;left:50%;transform:translateX(-50%);top:41px"></svg>
+
+  <div class="axis" style="top:150px"><div class="eyebrow kns" style="letter-spacing:.18em;font-size:19px">ಇಸ್ಕಾನ್ ದಕ್ಷಿಣ ಬೆಂಗಳೂರು &nbsp;·&nbsp; ಐಸಿಸಿ ಮೆಗಾ ಶಾಲಾ ಔಟ್‌ರೀಚ್</div></div>
+
+  <div class="halo soft" style="width:560px;height:560px;left:50%;top:198px;transform:translateX(-50%)"></div>
+  <div class="halo"      style="width:430px;height:430px;left:50%;top:263px;transform:translateX(-50%)"></div>
+  <svg id="featherK" width="300" height="420" viewBox="0 0 300 420" style="position:absolute;left:50%;top:250px;transform:translateX(-50%)"></svg>
+
+  <div class="axis" style="top:716px"><div class="knd" style="font-size:128px;font-weight:700;color:var(--maroon);line-height:1">ಕಲಾ ಸಂಗಮ</div></div>
+
+  <div class="axis" style="top:910px"><div class="knd" style="font-size:46px;font-weight:600;color:var(--maroon2)">ಶ್ರೀ ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ <span style="color:var(--deep)">2026</span></div></div>
+  <div class="axis" style="top:976px"><div class="kns" style="font-size:28px;letter-spacing:.22em;color:var(--maroon2)">ಸಾಂಸ್ಕೃತಿಕ ಸ್ಪರ್ಧೆಗಳು</div></div>
+
+  <div class="axis" style="top:1040px"><span class="ribbon"><span class="lbl kns" style="font-size:17px;letter-spacing:.18em">ವಿಷಯ</span><span class="val knd" style="font-style:normal;font-size:34px;font-weight:600">ವೃಂದಾವನ ಗ್ರಾಮದಲ್ಲಿ ಶ್ರೀ ಕೃಷ್ಣ</span></span></div>
+
+  <div class="axis" style="top:1150px"><div class="cats">
+    <div class="cat"><div class="h knd" style="font-size:34px;font-weight:600">ಬಣ್ಣ ತುಂಬುವಿಕೆ</div><div class="s kns" style="font-size:24px">2 – 5ನೇ ತರಗತಿ</div></div>
+    <div class="cat"><div class="h knd" style="font-size:34px;font-weight:600">ಚಿತ್ರಕಲೆ</div><div class="s kns" style="font-size:24px">6 – 10ನೇ ತರಗತಿ</div></div>
+  </div></div>
+
+  <div class="axis" style="top:1342px"><div class="detail kns" style="font-size:28px;color:var(--maroon2)">ಮಹಾ ಅಂತಿಮ <span class="dot"></span> <span style="color:var(--maroon)">ಐಸಿಸಿ ದೇವಾಲಯ</span> <span class="dot"></span> ಬೆಳಿಗ್ಗೆ 10:00</div></div>
+  <div class="axis" style="top:1398px"><div class="knd" style="font-size:34px;font-weight:600;color:var(--maroon)">ಶನಿವಾರ &nbsp; 22 / 29 ಆಗಸ್ಟ್ 2026</div></div>
+
+  <div class="axis" style="top:1496px"><div class="org">॥ &nbsp; ಹರೇ ಕೃಷ್ಣ &nbsp; ॥</div></div>
+  <div class="axis" style="top:1524px"><div class="kns" style="font-size:21px;font-style:normal;color:var(--deep)">ಸೇವೆಯಲ್ಲಿ ಅರ್ಪಿತ · 60–50 ಆಚರಣಾ ತಂಡ</div></div>
+</div>
+
+<script>
+  var NS="http://www.w3.org/2000/svg";
+  function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+  /* ---- toran: hanging mango leaves ---- */
+  function buildToran(id){
+    var s=document.getElementById(id), W=1132, n=23, gap=W/n;
+    s.appendChild(el('path',{d:'M0,6 H'+W,stroke:'#bd5d08','stroke-width':2,fill:'none'}));
+    for(var i=0;i<=n;i++){
+      var x=i*gap, long=(i%2===0), h=long?64:44, w=18;
+      // leaf
+      s.appendChild(el('path',{
+        d:'M'+x+',6 C'+(x-w)+','+(h*0.45)+' '+(x-w)+','+(h*0.8)+' '+x+','+h+
+          ' C'+(x+w)+','+(h*0.8)+' '+(x+w)+','+(h*0.45)+' '+x+',6 Z',
+        fill: long?'#e07b1a':'#c98f2e', opacity:long?.95:.85}));
+      s.appendChild(el('line',{x1:x,y1:8,x2:x,y2:h-4,stroke:'#fcf5e3','stroke-width':1,opacity:.5}));
+    }
+  }
+  buildToran('toran');
+
+  /* ---- peacock feather (gold/amber, in-palette) ---- */
+  function feather(svg){
+    var s=document.getElementById(svg), cx=150;
+    var stemTop=120, stemBot=410;
+    // stem
+    s.appendChild(el('path',{d:'M'+cx+','+stemBot+' C'+(cx-4)+','+(stemBot-150)+' '+(cx-2)+','+(stemTop+60)+' '+cx+','+stemTop,
+      stroke:'#8a4a12','stroke-width':3,fill:'none','stroke-linecap':'round'}));
+    // barbs along the stem
+    for(var y=stemBot-20; y>stemTop+70; y-=12){
+      var t=(stemBot-20-y)/(stemBot-20-(stemTop+70)); // 0..1 up
+      var len=14+Math.sin(t*Math.PI)*30;
+      var droop=10+t*6;
+      s.appendChild(el('path',{d:'M'+cx+','+y+' q'+(-len*0.6)+','+(-droop)+' '+(-len)+','+(-droop*1.6),
+        stroke:'#cf982f','stroke-width':1.6,fill:'none',opacity:.85,'stroke-linecap':'round'}));
+      s.appendChild(el('path',{d:'M'+cx+','+y+' q'+(len*0.6)+','+(-droop)+' '+(len)+','+(-droop*1.6),
+        stroke:'#cf982f','stroke-width':1.6,fill:'none',opacity:.85,'stroke-linecap':'round'}));
+    }
+    // the eye (layered, near top)
+    var ey=130;
+    s.appendChild(el('ellipse',{cx:cx,cy:ey,rx:62,ry:80,fill:'#e9c46a',opacity:.55})); // outer glow
+    s.appendChild(el('ellipse',{cx:cx,cy:ey,rx:46,ry:62,fill:'#d98a2b'}));               // amber
+    s.appendChild(el('ellipse',{cx:cx,cy:ey+6,rx:33,ry:44,fill:'#bd5d08'}));             // deep
+    s.appendChild(el('ellipse',{cx:cx,cy:ey+12,rx:21,ry:30,fill:'#4a1d0a'}));            // maroon heart
+    s.appendChild(el('ellipse',{cx:cx,cy:ey+12,rx:11,ry:17,fill:'#c98f2e'}));            // gold pupil
+    s.appendChild(el('circle',{cx:cx-3,cy:ey+7,r:3,fill:'#fcf5e3',opacity:.9}));         // glint
+    // crown filaments above the eye
+    for(var a=-3;a<=3;a++){
+      s.appendChild(el('path',{d:'M'+cx+','+(ey-72)+' q'+(a*9)+','+(-16)+' '+(a*14)+','+(-34),
+        stroke:'#cf982f','stroke-width':1.4,fill:'none',opacity:.8,'stroke-linecap':'round'}));
+      s.appendChild(el('circle',{cx:cx+a*14,cy:ey-72-34,r:2.4,fill:'#d98a2b',opacity:.85}));
+    }
+  }
+  feather('feather'); feather('feather2');
+
+  /* ---- temple skyline silhouette (bottom band) ---- */
+  function buildSkyline(id){
+    var s=document.getElementById(id);
+    function gopuram(cx,base,w,h){
+      var tiers=6, p='M'+(cx-w)+','+base, tw=w, th=h/tiers, by=base;
+      for(var i=0;i<tiers;i++){ var ny=by-th, nw=tw*0.8;
+        p+=' L'+(cx-tw)+','+by+' L'+(cx-nw)+','+ny; tw=nw; by=ny; }
+      p+=' L'+cx+','+(by-18); // finial
+      // mirror
+      tw=w; by=base; var pr='';
+      for(var j=0;j<tiers;j++){ var ny2=by-th, nw2=tw*0.8;
+        pr=' L'+(cx+nw2)+','+ny2+' L'+(cx+tw)+','+by+pr; tw=nw2; by=ny2; }
+      p=' M'+(cx-w)+','+base+p.substring(p.indexOf(' L'))+' L'+cx+','+(base-h-18)+pr+' L'+(cx+w)+','+base+' Z';
+      s.appendChild(el('path',{d:'M'+(cx-w)+','+base+' '+rebuild(cx,base,w,h,tiers),fill:'#4a1d0a'}));
+    }
+    function rebuild(cx,base,w,h,tiers){
+      var th=h/tiers, tw=w, by=base, L='', R='';
+      for(var i=0;i<tiers;i++){var ny=by-th,nw=tw*0.78;
+        L+='L'+(cx-tw)+','+by+' L'+(cx-nw)+','+ny+' '; R='L'+(cx+nw)+','+ny+' L'+(cx+tw)+','+by+' '+R;
+        tw=nw;by=ny;}
+      return L+'L'+cx+','+(by-22)+' '+R+'Z';
+    }
+    gopuram(600,320,150,250);
+    gopuram(300,320,110,180);
+    gopuram(900,320,110,180);
+    gopuram(120,320,80,120);
+    gopuram(1080,320,80,120);
+  }
+  buildSkyline('silhouette');
+
+  /* ---- Kannada poster motifs ---- */
+  if(document.getElementById('toranK')){ buildToran('toranK'); feather('featherK'); buildSkyline('silhouetteK'); }
+</script>
+</body></html>
