@@ -1,0 +1,9 @@
+# Core (always needed)
+anthropic>=0.40
+python-dotenv>=1.0
+PyYAML>=6.0
+
+# Only needed for INPUT_MODE=drive (reading Google Sheet + Drive uploads)
+gspread>=6.0
+google-api-python-client>=2.0
+google-auth>=2.0

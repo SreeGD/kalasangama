@@ -1,0 +1,23 @@
+# Secrets
+phase3-ai-judging/.env
+phase3-ai-judging/service-account.json
+*.key.json
+
+# Phase 3 runtime
+phase3-ai-judging/.venv/
+phase3-ai-judging/output/
+phase3-ai-judging/input/images/*
+!phase3-ai-judging/input/images/README.md
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Local Claude Code settings
+.claude/

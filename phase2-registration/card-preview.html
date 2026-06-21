@@ -1,0 +1,53 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Kala Sangama — Registration Card preview</title>
+<!--
+  Visual preview of the card produced by RegistrationCard.gs (sample data).
+  Open in a browser. Keep the styles here in sync with cardHtml_() in the .gs.
+-->
+<style>
+  * { box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
+  body { margin: 0; padding: 40px; background: #f3ead2; }
+  .card { width: 540px; margin: 0 auto; background:#fff; border: 2px solid #e07b1a; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(74,29,10,.15); }
+  .head { background: #e07b1a; color: #fff; padding: 16px 22px; }
+  .head .t { font-size: 22px; font-weight: bold; letter-spacing: .5px; }
+  .head .o { font-size: 11px; opacity: .95; margin-top: 2px; }
+  .head .badge { float: right; font-size: 10px; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.6); border-radius: 999px; padding: 4px 10px; }
+  .body { padding: 18px 22px; }
+  .theme { color: #a8500a; font-size: 12px; font-style: italic; margin: 0 0 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  td { vertical-align: top; padding: 4px 0; }
+  .lbl { color: #7a5c44; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+  .val { color: #3a2414; font-size: 16px; font-weight: bold; }
+  .idval { color: #c4630b; font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+  .qrcell { width: 130px; text-align: right; }
+  .qr { width: 120px; height: 120px; }
+  .foot { border-top: 2px dashed #e0b48a; margin-top: 8px; padding: 12px 22px; background: #fbf3e3; color: #6b3318; font-size: 11px; }
+  .foot b { color: #a8500a; }
+</style></head>
+<body><div class="card">
+  <div class="head"><span class="badge">LEVEL 1 HALL TICKET</span>
+    <div class="t">Kala Sangama 2026</div>
+    <div class="o">ISKCON South Bengaluru · ICC Mega School Outreach</div></div>
+  <div class="body"><p class="theme">Theme: Sri Krishna at Vrindavan Village</p>
+  <table><tr>
+    <td>
+      <div class="lbl">Registration ID</div><div class="idval">KS2026-0042</div>
+      <div style="height:10px"></div>
+      <div class="lbl">Student</div><div class="val">Diya Sharma</div>
+      <div style="height:8px"></div>
+      <div class="lbl">School</div><div class="val">Sri Vidya School</div>
+      <div style="height:8px"></div>
+      <table style="width:100%"><tr>
+        <td><div class="lbl">Standard</div><div class="val">3rd</div></td>
+        <td><div class="lbl">Category</div><div class="val">Coloring (Std 2–5)</div></td>
+      </tr></table>
+    </td>
+    <td class="qrcell">
+      <img class="qr" alt="QR"
+        src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=KS2026-0042%20%7C%20Diya%20Sharma%20%7C%20Coloring%20%7C%203rd">
+    </td>
+  </tr></table></div>
+  <div class="foot"><b>Bring this card to the Level 1 competition.</b> It is your hall ticket —
+    keep it safe. Valid only for the named student. Hare Krishna.</div>
+</div></body></html>

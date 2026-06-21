@@ -1,0 +1,58 @@
+# Kala Sangama 2026 — Judging Rubric
+# Theme: "Sri Krishna at Vrindavan Village"
+# Edit freely. Criterion weights should sum to 100. Each criterion is scored 0–10
+# by the AI; the weighted total (0–100) is used to rank entries.
+#
+# This is an ADVISORY pre-screen. Human judges make the final decision.
+
+theme: "Sri Krishna at Vrindavan Village"
+scale_max: 10        # each criterion scored 0..scale_max
+
+criteria:
+  - key: theme
+    name: "Theme adherence"
+    weight: 25
+    description: >
+      How clearly and meaningfully the artwork depicts Sri Krishna and the Vrindavan
+      village setting (e.g. Krishna, cows, flute, peacocks, Yamuna, kadamba trees,
+      village huts). Reward recognisable, on-theme storytelling.
+
+  - key: creativity
+    name: "Creativity & originality"
+    weight: 20
+    description: >
+      Imagination, fresh perspective, and personal expression rather than a rote copy.
+
+  - key: color
+    name: "Colour usage & harmony"
+    weight: 20
+    description: >
+      Thoughtful, harmonious colour choices; vibrancy; consistent and pleasing palette.
+
+  - key: technique
+    name: "Technique & neatness"
+    weight: 20
+    description: >
+      Control of the medium, line quality, shading/blending, and overall neatness
+      (for Coloring, staying within lines and even fills count strongly).
+
+  - key: composition
+    name: "Composition & balance"
+    weight: 15
+    description: >
+      Use of space, balance, focal point, and overall visual harmony of the layout.
+
+# Age-group guidance the judge should apply (judge RELATIVE to the age group, fairly).
+category_notes:
+  "Coloring (Std 2–5)": >
+    Ages ~7–11. Emphasise neatness, even colouring within lines, colour choice and
+    effort. Do not penalise simple drawing skill; reward care and enthusiasm.
+  "Painting (Std 6–10)": >
+    Ages ~11–16. Expect stronger technique, composition, shading and originality.
+
+# Overall instruction appended to the judge prompt.
+guidance: >
+  Judge each piece fairly and encouragingly for the child's age group. Be consistent
+  across entries. Avoid bias based on photo quality, lighting, or paper type — judge
+  the artwork, not the photograph. If the image is unclear or off-theme, say so in the
+  notes and score conservatively.
