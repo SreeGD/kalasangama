@@ -35,7 +35,6 @@
 
       <nav class="main-nav" aria-label="Primary">
         <a href="#about" data-i18n="nav.about">About</a>
-        <a href="#video" data-i18n="nav.watch">Watch</a>
         <a href="#categories" data-i18n="nav.categories">Categories</a>
         <a href="#timeline" data-i18n="nav.timeline">Timeline</a>
         <a href="#register" data-i18n="nav.register">Register</a>
@@ -58,7 +57,7 @@
   <!-- ============ HERO ============ -->
   <section class="hero">
     <div class="hero-overlay"></div>
-    <div class="container">
+    <div class="container hero-grid">
       <div class="hero-inner">
       <p class="hero-eyebrow" data-i18n="hero.eyebrow">ISKCON South Bengaluru · ICC Mega School Outreach</p>
       <h1 class="hero-title" data-i18n="hero.title">Kala Sangama</h1>
@@ -78,26 +77,12 @@
         <li><strong data-i18n="hero.fact3Value">Aug 2026</strong><span data-i18n="hero.fact3Label">Grand Finale at ICC Temple</span></li>
       </ul>
       </div>
-    </div>
-  </section>
-
-  <!-- ============ VIDEO ============ -->
-  <section class="section section-alt" id="video">
-    <div class="container video-band">
-      <div class="video-copy">
-        <h2 class="section-title" data-i18n="video.title">Watch the Story</h2>
-        <p class="section-lead" data-i18n="video.lead">A journey of art, values and inspiration — see what Kala Sangama is about.</p>
-        <ul class="video-points">
-          <li data-i18n="video.p1">Theme: Sri Krishna at Vrindavan Village</li>
-          <li data-i18n="video.p2">Coloring (Std 2–5) &amp; Painting (Std 6–10)</li>
-          <li data-i18n="video.p3">Inter-school finals at the ICC Temple</li>
-        </ul>
-        <a href="#register" class="btn btn-primary" data-i18n="video.cta">Register now</a>
-        <p class="note" id="videoFallback" data-i18n="video.soon">Promotional video coming soon.</p>
-      </div>
-      <div class="video-frame" id="videoFrame" hidden>
-        <iframe id="promoVideo" title="Kala Sangama promotional video"
-                allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>
+      <div class="hero-media">
+        <div class="video-frame" id="videoFrame" hidden>
+          <iframe id="promoVideo" title="Kala Sangama promotional video"
+                  allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="hero-note" id="videoFallback" data-i18n="video.soon">Promotional video coming soon.</p>
       </div>
     </div>
   </section>
