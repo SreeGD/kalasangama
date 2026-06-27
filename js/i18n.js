@@ -17,10 +17,15 @@ window.KALA_I18N = {
 
     "video.title": "Watch the Story",
     "video.lead": "A journey of art, values and inspiration — see what Kala Sangama is about.",
+    "video.p1": "Theme: Sri Krishna at Vrindavan Village",
+    "video.p2": "Coloring (Std 2–5) & Painting (Std 6–10)",
+    "video.p3": "Inter-school finals at the ICC Temple",
+    "video.cta": "Register now",
     "video.soon": "Promotional video coming soon.",
 
     "hero.eyebrow": "ISKCON South Bengaluru · ICC Mega School Outreach",
     "hero.title": "Kala Sangama",
+    "hero.tagline": "A Journey of Art, Values & Inspiration",
     "hero.subtitle": "Sri Krishna Janmashtami 2026 · Cultural Competitions",
     "hero.themeLabel": "Theme",
     "hero.theme": "Sri Krishna at Vrindavan Village",
@@ -127,10 +132,15 @@ window.KALA_I18N = {
 
     "video.title": "ಕಥೆಯನ್ನು ವೀಕ್ಷಿಸಿ",
     "video.lead": "ಕಲೆ, ಮೌಲ್ಯಗಳು ಮತ್ತು ಸ್ಫೂರ್ತಿಯ ಪಯಣ — ಕಲಾ ಸಂಗಮ ಏನೆಂದು ನೋಡಿ.",
+    "video.p1": "ವಿಷಯ: ವೃಂದಾವನ ಗ್ರಾಮದಲ್ಲಿ ಶ್ರೀ ಕೃಷ್ಣ",
+    "video.p2": "ಬಣ್ಣ ತುಂಬುವಿಕೆ (2–5ನೇ) ಮತ್ತು ಚಿತ್ರಕಲೆ (6–10ನೇ)",
+    "video.p3": "ಐಸಿಸಿ ದೇವಾಲಯದಲ್ಲಿ ಅಂತರ್ ಶಾಲಾ ಅಂತಿಮ ಸ್ಪರ್ಧೆ",
+    "video.cta": "ಈಗ ನೋಂದಾಯಿಸಿ",
     "video.soon": "ಪ್ರಚಾರ ವೀಡಿಯೊ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ.",
 
     "hero.eyebrow": "ಇಸ್ಕಾನ್ ದಕ್ಷಿಣ ಬೆಂಗಳೂರು · ಐಸಿಸಿ ಮೆಗಾ ಶಾಲಾ ಔಟ್‌ರೀಚ್",
     "hero.title": "ಕಲಾ ಸಂಗಮ",
+    "hero.tagline": "ಕಲೆ, ಮೌಲ್ಯಗಳು ಮತ್ತು ಸ್ಫೂರ್ತಿಯ ಪಯಣ",
     "hero.subtitle": "ಶ್ರೀ ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ 2026 · ಸಾಂಸ್ಕೃತಿಕ ಸ್ಪರ್ಧೆಗಳು",
     "hero.themeLabel": "ವಿಷಯ",
     "hero.theme": "ವೃಂದಾವನ ಗ್ರಾಮದಲ್ಲಿ ಶ್ರೀ ಕೃಷ್ಣ",
