@@ -148,6 +148,14 @@ img { max-width: 100%; display: block; }
 .card h3 { margin: 0 0 10px; font-size: 1.25rem; }
 .card p { margin: 0; color: var(--maroon-soft); }
 
+/* ---------- Promo video ---------- */
+.video-frame {
+  max-width: 340px; margin: 8px auto 0; aspect-ratio: 9 / 16;
+  border-radius: 20px; overflow: hidden; box-shadow: var(--shadow);
+  background: #1a1a1a; border: 1px solid rgba(74, 29, 10, 0.1);
+}
+.video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
 /* ---------- Categories table ---------- */
 .table-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow-sm); background: var(--white); }
 .cat-table { width: 100%; border-collapse: collapse; min-width: 560px; }

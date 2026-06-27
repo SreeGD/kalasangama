@@ -9,10 +9,15 @@ window.KALA_I18N = {
     "brand.tag": "ISKCON South Bengaluru",
 
     "nav.about": "About",
+    "nav.watch": "Watch",
     "nav.categories": "Categories",
     "nav.timeline": "Timeline",
     "nav.register": "Register",
     "nav.contact": "Contact",
+
+    "video.title": "Watch the Story",
+    "video.lead": "A journey of art, values and inspiration — see what Kala Sangama is about.",
+    "video.soon": "Promotional video coming soon.",
 
     "hero.eyebrow": "ISKCON South Bengaluru · ICC Mega School Outreach",
     "hero.title": "Kala Sangama",
@@ -114,10 +119,15 @@ window.KALA_I18N = {
     "brand.tag": "ಇಸ್ಕಾನ್ ದಕ್ಷಿಣ ಬೆಂಗಳೂರು",
 
     "nav.about": "ಪರಿಚಯ",
+    "nav.watch": "ವೀಕ್ಷಿಸಿ",
     "nav.categories": "ವಿಭಾಗಗಳು",
     "nav.timeline": "ಕಾಲಸೂಚಿ",
     "nav.register": "ನೋಂದಣಿ",
     "nav.contact": "ಸಂಪರ್ಕ",
+
+    "video.title": "ಕಥೆಯನ್ನು ವೀಕ್ಷಿಸಿ",
+    "video.lead": "ಕಲೆ, ಮೌಲ್ಯಗಳು ಮತ್ತು ಸ್ಫೂರ್ತಿಯ ಪಯಣ — ಕಲಾ ಸಂಗಮ ಏನೆಂದು ನೋಡಿ.",
+    "video.soon": "ಪ್ರಚಾರ ವೀಡಿಯೊ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ.",
 
     "hero.eyebrow": "ಇಸ್ಕಾನ್ ದಕ್ಷಿಣ ಬೆಂಗಳೂರು · ಐಸಿಸಿ ಮೆಗಾ ಶಾಲಾ ಔಟ್‌ರೀಚ್",
     "hero.title": "ಕಲಾ ಸಂಗಮ",

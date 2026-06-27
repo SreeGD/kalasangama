@@ -114,6 +114,19 @@
     });
   }
 
+  /* ---------- Promotional video ---------- */
+  function initVideo() {
+    var id = (CFG.video || {}).driveId;
+    var frame = document.getElementById("videoFrame");
+    var iframe = document.getElementById("promoVideo");
+    var fallback = document.getElementById("videoFallback");
+    if (id && frame && iframe) {
+      iframe.setAttribute("src", "https://drive.google.com/file/d/" + id + "/preview");
+      frame.hidden = false;
+      if (fallback) fallback.style.display = "none";
+    }
+  }
+
   /* ---------- Placeholder config warning ---------- */
   function warnPlaceholders() {
     var pending = [];
@@ -145,6 +158,7 @@
     initRegLinks();
     initContact();
     initShare();
+    initVideo();
     warnPlaceholders();
   });
 })();

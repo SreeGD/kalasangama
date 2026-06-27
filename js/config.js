@@ -5,11 +5,17 @@
    Search this file for "REPLACE" to find every value to update.
    ============================================================ */
 window.KALA_CONFIG = {
-  // Phase 2 — Google Form links (paste the published form URLs from the
-  // Apps Script setupAll log). These activate the "Register" buttons.
+  // Registration links. Both "Register" buttons point here. Swap to separate
+  // School / Student form URLs later if you split them.
   forms: {
-    school:  "https://forms.gle/REPLACE-school-registration",   // REPLACE
-    student: "https://forms.gle/REPLACE-student-registration",  // REPLACE
+    school:  "https://tinyurl.com/kalasangama",
+    student: "https://tinyurl.com/kalasangama",
+  },
+
+  // Promotional video — Google Drive file id. Set "" to hide the video section.
+  // The file must be shared "Anyone with the link – Viewer" to play for visitors.
+  video: {
+    driveId: "1t0VRXUKhv1yylpNQ1k9oYqF9RKw5kotC",
   },
 
   // Contact details for the core committee.
